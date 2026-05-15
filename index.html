@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VentureScore — SME Financial Health Checker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a7a4a;
+    --green-light: #e8f5ee;
+    --amber: #c47d0e;
+    --amber-light: #fef3dc;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --navy: #0f1f3d;
+    --navy-mid: #1a3260;
+    --gold: #d4a843;
+    --off-white: #f8f6f1;
+    --text: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e2ddd6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--navy);
+    padding: 60px 24px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(212,168,67,0.15);
+    border: 1px solid rgba(212,168,67,0.4);
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 span { color: var(--gold); font-style: italic; }
+
+  .hero p {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.05rem;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* MAIN CARD */
+  .main {
+    max-width: 720px;
+    margin: -32px auto 60px;
+    padding: 0 16px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .card {
+    background: var(--off-white);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+  }
+
+  .card-header {
+    background: #fff;
+    padding: 36px 40px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .card-header p {
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .form-body {
+    padding: 36px 40px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    margin-top: 28px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  .field {
+    margin-bottom: 18px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 7px;
+  }
+
+  .field .hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 7px;
+    font-weight: 400;
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-wrap .prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.95rem;
+    pointer-events: none;
+  }
+
+  .input-wrap input {
+    width: 100%;
+    padding: 12px 14px 12px 30px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--navy);
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  .input-wrap input::-webkit-outer-spin-button,
+  .input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .input-wrap input:focus {
+    outline: none;
+    border-color: var(--navy-mid);
+    box-shadow: 0 0 0 3px rgba(26,50,96,0.08);
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 28px;
+    letter-spacing: 0.3px;
+    transition: background 0.2s, transform 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn:hover { background: var(--navy-mid); }
+  .btn:active { transform: scale(0.99); }
+
+  /* RESULT */
+  .result {
+    display: none;
+    padding: 36px 40px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result.show { display: block; }
+
+  .rating-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px;
+    border-radius: 14px;
+    margin-bottom: 28px;
+  }
+
+  .rating-header.green { background: var(--green-light); border: 1.5px solid #a7d4b8; }
+  .rating-header.amber { background: var(--amber-light); border: 1.5px solid #f0c87a; }
+  .rating-header.red { background: var(--red-light); border: 1.5px solid #f5b7b1; }
+
+  .traffic-light {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    opacity: 0.2;
+    transition: opacity 0.3s;
+  }
+
+  .dot.red-dot { background: #e74c3c; }
+  .dot.amber-dot { background: #f39c12; }
+  .dot.green-dot { background: #27ae60; }
+
+  .dot.active { opacity: 1; }
+
+  .rating-text h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+
+  .rating-text h3.green { color: var(--green); }
+  .rating-text h3.amber { color: var(--amber); }
+  .rating-text h3.red { color: var(--red); }
+
+  .rating-text p { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+
+  /* SCORE BAR */
+  .score-section { margin-bottom: 28px; }
+
+  .score-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .score-label { font-size: 0.85rem; font-weight: 500; color: var(--navy); }
+  .score-value { font-size: 1.4rem; font-weight: 600; font-family: 'DM Serif Display', serif; color: var(--navy); }
+
+  .bar-track {
+    height: 10px;
+    background: var(--border);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .bar-fill.green { background: var(--green); }
+  .bar-fill.amber { background: var(--amber); }
+  .bar-fill.red { background: var(--red); }
+
+  /* METRICS GRID */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .metric {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .metric-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.35rem;
+    color: var(--navy);
+  }
+
+  .metric-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* RECOMMENDATIONS */
+  .recs-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--navy);
+    margin-bottom: 14px;
+  }
+
+  .rec {
+    display: flex;
+    gap: 14px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .rec-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .rec-icon.green { background: var(--green-light); }
+  .rec-icon.amber { background: var(--amber-light); }
+  .rec-icon.red { background: var(--red-light); }
+
+  .rec-text { font-size: 0.875rem; line-height: 1.6; color: var(--text); }
+
+  .reset-btn {
+    background: none;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .reset-btn:hover { border-color: var(--navy); color: var(--navy); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 32px 16px 48px;
+    color: rgba(255,255,255,0.3);
+    font-size: 0.8rem;
+  }
+
+  footer strong { color: rgba(255,255,255,0.5); }
+
+  @media (max-width: 560px) {
+    .card-header, .form-body, .result { padding: 24px 20px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">Free Tool for Small Businesses</div>
+  <h1>Venture<span>Score</span></h1>
+  <p>Find out if your business finances are in a healthy position — in plain English, in under a minute.</p>
+</div>
+
+<div class="main">
+  <div class="card">
+    <div class="card-header">
+      <h2>Your Financial Health Check</h2>
+      <p>Enter your average monthly figures below. All data stays in your browser — nothing is stored or sent anywhere.</p>
+    </div>
+
+    <div class="form-body">
+      <div class="section-label">Revenue & Costs</div>
+
+      <div class="field">
+        <label>Monthly Revenue</label>
+        <div class="hint">Total money coming into the business each month</div>
+        <div class="input-wrap">
+          <span class="prefix">£</span>
+          <input type="number" id="revenue" placeholder="e.g. 12000" min="0">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Fixed Costs</label>
+          <div class="hint">Rent, salaries, subscriptions</div>
+          <div class="input-wrap">
+            <span class="prefix">£</span>
+            <input type="number" id="fixed" placeholder="e.g. 4000" min="0">
+          </div>
+        </div>
+        <div class="field">
+          <label>Variable Costs</label>
+          <div class="hint">Stock, delivery, materials</div>
+          <div class="input-wrap">
+            <span class="prefix">£</span>
+            <input type="number" id="variable" placeholder="e.g. 3000" min="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Debt & Obligations</div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Total Debt Outstanding</label>
+          <div class="hint">Loans, overdrafts, finance</div>
+          <div class="input-wrap">
+            <span class="prefix">£</span>
+            <input type="number" id="debt" placeholder="e.g. 25000" min="0">
+          </div>
+        </div>
+        <div class="field">
+          <label>Monthly Debt Repayment</label>
+          <div class="hint">What you pay back each month</div>
+          <div class="input-wrap">
+            <span class="prefix">£</span>
+            <input type="number" id="repayment" placeholder="e.g. 800" min="0">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="calculate()">Check My VentureScore →</button>
+    </div>
+
+    <div class="result" id="result">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>VentureScore</strong> — Built to help small business owners understand their financial position.<br>
+  Not financial advice. Always speak to a qualified advisor for major decisions.
+</footer>
+
+<script>
+function calculate() {
+  const revenue = parseFloat(document.getElementById('revenue').value) || 0;
+  const fixed = parseFloat(document.getElementById('fixed').value) || 0;
+  const variable = parseFloat(document.getElementById('variable').value) || 0;
+  const debt = parseFloat(document.getElementById('debt').value) || 0;
+  const repayment = parseFloat(document.getElementById('repayment').value) || 0;
+
+  if (revenue <= 0) {
+    alert('Please enter your monthly revenue to get your score.');
+    return;
+  }
+
+  const totalCosts = fixed + variable;
+  const profit = revenue - totalCosts;
+  const profitMargin = (profit / revenue) * 100;
+  const costRatio = (totalCosts / revenue) * 100;
+  const monthsToPayDebt = repayment > 0 && debt > 0
+    ? Math.ceil(debt / repayment)
+    : (debt > 0 ? null : 0);
+
+  // SCORING
+  let score = 0;
+
+  // Profit margin (max 40pts)
+  if (profitMargin >= 20) score += 40;
+  else if (profitMargin >= 10) score += 28;
+  else if (profitMargin >= 0) score += 14;
+  else score += 0;
+
+  // Cost ratio (max 30pts)
+  if (costRatio <= 60) score += 30;
+  else if (costRatio <= 75) score += 20;
+  else if (costRatio <= 90) score += 10;
+  else score += 0;
+
+  // Debt repayment burden (max 30pts)
+  if (debt === 0) {
+    score += 30;
+  } else {
+    const debtBurden = (repayment / revenue) * 100;
+    if (debtBurden <= 10) score += 30;
+    else if (debtBurden <= 20) score += 18;
+    else if (debtBurden <= 35) score += 8;
+    else score += 0;
+  }
+
+  // RATING
+  let rating, colour, summary;
+  if (score >= 70) {
+    rating = 'Healthy'; colour = 'green';
+    summary = 'Your business is in a strong financial position. You have good profit margins, controlled costs, and manageable debt levels.';
+  } else if (score >= 40) {
+    rating = 'Needs Attention'; colour = 'amber';
+    summary = 'Your business is running but there are areas to watch. Some improvements now could prevent bigger problems later.';
+  } else {
+    rating = 'Under Pressure'; colour = 'red';
+    summary = 'Your figures suggest the business is under financial strain. It\'s worth taking action soon and speaking to an advisor.';
+  }
+
+  // RECOMMENDATIONS
+  const recs = [];
+
+  if (profitMargin < 10) {
+    recs.push({ icon: '📉', colour: profitMargin < 0 ? 'red' : 'amber', text: profitMargin < 0 ? 'Your business is currently making a loss. Every pound earned is not covering your costs. Reducing overheads or increasing prices should be a priority.' : 'Your profit margin is thin. Look at where costs can be trimmed or whether your pricing reflects the true value you deliver.' });
+  } else {
+    recs.push({ icon: '✅', colour: 'green', text: `Your profit margin of ${profitMargin.toFixed(1)}% is solid. Keep monitoring costs to protect it as the business grows.` });
+  }
+
+  if (costRatio > 75) {
+    recs.push({ icon: '⚠️', colour: 'amber', text: `${costRatio.toFixed(0)}p of every £1 you earn goes straight back out on costs. Review your biggest expenses and look for areas to reduce without affecting quality.` });
+  }
+
+  if (debt > 0 && repayment > 0) {
+    const burden = (repayment / revenue) * 100;
+    if (burden > 20) {
+      recs.push({ icon: '🏦', colour: 'red', text: `Your debt repayments are taking up ${burden.toFixed(0)}% of your monthly revenue. This leaves very little room if income dips. Speak to your lender about repayment options.` });
+    } else {
+      recs.push({ icon: '🏦', colour: 'green', text: `Your debt repayment burden is manageable at ${burden.toFixed(0)}% of revenue. ${monthsToPayDebt ? `At this rate, you'll be debt-free in around ${monthsToPayDebt} months.` : ''}` });
+    }
+  } else if (debt === 0) {
+    recs.push({ icon: '🎯', colour: 'green', text: 'No outstanding debt is a real strength. This gives you flexibility to invest in growth when the time is right.' });
+  }
+
+  if (profit > 0 && profitMargin >= 10) {
+    recs.push({ icon: '💡', colour: 'green', text: `You're generating £${profit.toLocaleString()} in monthly profit. Consider setting aside a portion as a cash reserve to protect against slow months.` });
+  }
+
+  // RENDER
+  const trafficLights = `
+    <div class="traffic-light">
+      <div class="dot red-dot ${colour === 'red' ? 'active' : ''}"></div>
+      <div class="dot amber-dot ${colour === 'amber' ? 'active' : ''}"></div>
+      <div class="dot green-dot ${colour === 'green' ? 'active' : ''}"></div>
+    </div>`;
+
+  const recsHTML = recs.map(r => `
+    <div class="rec">
+      <div class="rec-icon ${r.colour}">${r.icon}</div>
+      <div class="rec-text">${r.text}</div>
+    </div>`).join('');
+
+  const debtLine = monthsToPayDebt === null
+    ? '<div class="metric"><div class="metric-label">Debt Payoff</div><div class="metric-value">—</div><div class="metric-sub">No repayment set</div></div>'
+    : monthsToPayDebt === 0
+    ? '<div class="metric"><div class="metric-label">Debt Payoff</div><div class="metric-value">Debt-free</div><div class="metric-sub">No outstanding debt</div></div>'
+    : `<div class="metric"><div class="metric-label">Debt Payoff</div><div class="metric-value">${monthsToPayDebt}mo</div><div class="metric-sub">at current rate</div></div>`;
+
+  document.getElementById('result').innerHTML = `
+    <div class="rating-header ${colour}">
+      ${trafficLights}
+      <div class="rating-text">
+        <h3 class="${colour}">${rating}</h3>
+        <p>${summary}</p>
+      </div>
+    </div>
+
+    <div class="score-section">
+      <div class="score-row">
+        <span class="score-label">Your VentureScore</span>
+        <span class="score-value">${score}/100</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill ${colour}" style="width: 0%" id="bar"></div>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Profit Margin</div>
+        <div class="metric-value">${profitMargin.toFixed(1)}%</div>
+        <div class="metric-sub">£${profit.toLocaleString()} / mo</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Cost Ratio</div>
+        <div class="metric-value">${costRatio.toFixed(0)}%</div>
+        <div class="metric-sub">of revenue on costs</div>
+      </div>
+      ${debtLine}
+    </div>
+
+    <p class="recs-title">What to focus on</p>
+    ${recsHTML}
+
+    <button class="reset-btn" onclick="reset()">← Start over</button>
+  `;
+
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  setTimeout(() => {
+    const bar = document.getElementById('bar');
+    if (bar) bar.style.width = score + '%';
+  }, 100);
+}
+
+function reset() {
+  ['revenue','fixed','variable','debt','repayment'].forEach(id => document.getElementById(id).value = '');
+  const result = document.getElementById('result');
+  result.classList.remove('show');
+  result.innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
